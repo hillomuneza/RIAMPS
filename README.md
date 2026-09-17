@@ -1,19 +1,62 @@
-# RIAMPS frontend
+const tabs = document.querySelectorAll('.tab-button');
+const forms = document.querySelectorAll('.auth-form');
+const primaryActionButtons = document.querySelectorAll('[data-target]');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const momoForm = document.getElementById('momoForm');
+const companyAccess = document.getElementById('companyAccess');
 
-A responsive, dependency-free landing workspace UI for RIAMPS. It is designed to deploy directly to GitHub Pages.
+function activateTab(formId) {
+  tabs.forEach((button) => {
+    button.classList.toggle('active', button.dataset.form === formId);
+  });
 
-## Run locally
+  forms.forEach((form) => {
+    form.classList.toggle('active', form.id === formId);
+  });
+}
 
-Open `index.html` in a browser, or serve the folder with any static server:
+tabs.forEach((button) => {
+  button.addEventListener('click', () => activateTab(button.dataset.form));
+});
 
-```bash
-python3 -m http.server 8000
-```
+primaryActionButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const formId = button.dataset.target;
+    activateTab(formId);
+    document.getElementById('portal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
 
-Then visit `http://localhost:8000`.
+loginForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  document.getElementById('paymentPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
-## Structure
+signupForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  document.getElementById('paymentPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
-- `index.html` — semantic page structure and dashboard content
-- `styles.css` — responsive visual system, dashboard components, and layout
-- `app.js` — mobile navigation and active-section behavior
+momoForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  const button = momoForm.querySelector('button');
+  const originalText = button.textContent;
+  button.textContent = 'Processing payment...';
+  button.disabled = true;
+
+  setTimeout(() => {
+    button.textContent = 'Payment confirmed';
+    button.disabled = false;
+    document.getElementById('companyAccess').classList.remove('hidden');
+    document.getElementById('companyAccess').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const status = document.querySelector('.status-pill.warning');
+    if (status) {
+      status.textContent = 'Confirmed';
+      status.classList.remove('warning');
+      status.classList.add('success');
+    }
+  }, 1200);
+});
